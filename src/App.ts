@@ -2,6 +2,7 @@ import * as path from 'path'; //provides utilities for working with file and dir
 import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
+import LoginRouter from './routes/Login';
 
 
 class App{
@@ -30,7 +31,8 @@ class App{
                 message: 'Home'
             });
         });
-        this.express.use("/", router);
+        this.express.use("/api", router);
+        this.express.use("/api/login", LoginRouter);
     }
 }
 
