@@ -3,7 +3,8 @@ import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 import LoginRouter from './routes/Login';
-
+import UserRouter from './routes/User';
+import cryptoUtils from './CryptoUtils';
 
 class App{
 
@@ -32,7 +33,8 @@ class App{
             });
         });
         this.express.use("/api", router);
-        this.express.use("/api/login", LoginRouter);
+        this.express.use("/api/session", LoginRouter);
+        this.express.use("/api/user", UserRouter);
     }
 }
 

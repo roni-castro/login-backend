@@ -4,6 +4,7 @@ const express = require("express");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const Login_1 = require("./routes/Login");
+const User_1 = require("./routes/User");
 class App {
     constructor() {
         this.express = express();
@@ -25,7 +26,8 @@ class App {
             });
         });
         this.express.use("/api", router);
-        this.express.use("/api/login", Login_1.default);
+        this.express.use("/api/session", Login_1.default);
+        this.express.use("/api/user", User_1.default);
     }
 }
 exports.default = new App().express;
