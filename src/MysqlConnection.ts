@@ -1,16 +1,17 @@
 var mysql  = require ('mysql');
+require('dotenv').config()
 
 var connection = mysql.createConnection({
-    host: "localhost",
-    database: "logindb",
-    user: process.env.MYSQL_USER_NAME,
-    password: process.env.MYSQL_PASSWORD
-  });
+  host: process.env.DB_HOST,
+  database: process.env.DB_SCHEMA,
+  user: process.env.DB_USER_NAME,
+  password: process.env.DB_PASSWORD
+});
   
-  connection.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected!");
-  });
+connection.connect(function(err) {
+  if (err) console.log(err);
+  else console.log("Connected!");
+});
 
 export default connection;
 
