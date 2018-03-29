@@ -31,9 +31,7 @@ class LoginRouter {
                             let user = new UserModel_1.UserModel(userFromDB.id, userFromDB.user_name, userFromDB.first_name, userFromDB.last_name);
                             let token = CryptoUtils_1.default.createTokenWith({
                                 id: user.id,
-                                user_name: user.userName,
-                                first_name: user.firstname,
-                                last_name: user.lastName
+                                user_name: user.userName
                             });
                             res.status(200).json({
                                 id: user.id,

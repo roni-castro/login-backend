@@ -6,7 +6,7 @@ const CryptoUtils_1 = require("../CryptoUtils");
 class UserRouter {
     // Initialize the UserRouter
     constructor() {
-        //GET
+        //GET api/user
         this.getUsers = (req, res, next) => {
             MysqlConnection_1.default.query("SELECT id, user_name, first_name, last_name FROM tb_user", function (err, users) {
                 if (err) {
@@ -15,6 +15,40 @@ class UserRouter {
                 }
                 else {
                     res.json(users);
+                }
+            });
+        };
+        //DELETE api/user
+        this.deleteUser = (req, res, next) => {
+            MysqlConnection_1.default.query("DELETE FROM tb_user WHERE id = ?", [req.params.id], function (err, result) {
+                if (err) {
+                    res.status(400).json({ message: "Error deleting user" });
+                    console.log(err);
+                }
+                else {
+                    if (result.affectedRows == 0) {
+                        res.status(404).json({ message: "User not found" });
+                    }
+                    else {
+                        res.status(204).json({});
+                    }
+                }
+            });
+        };
+        //GET api/user/id
+        this.getSpecificUser = (req, res, next) => {
+            MysqlConnection_1.default.query("SELECT id, user_name, first_name, last_name FROM tb_user WHERE id = ?", [req.params.id], function (err, result) {
+                if (err) {
+                    res.json({ message: "Error getting user" });
+                    console.log(err);
+                }
+                else {
+                    if (result.length == 0) {
+                        res.status(404).json({ message: "User not found" });
+                    }
+                    else {
+                        res.json(result[0]);
+                    }
                 }
             });
         };
@@ -75,7 +109,9 @@ class UserRouter {
         this.init();
     }
     init() {
-        this.router.get("/", this.getUsers);
+        this.router.get("/", CryptoUtils_1.default.checkAuth, this.getUsers);
+        this.router.get("/:id", CryptoUtils_1.default.checkAuth, this.getSpecificUser);
+        this.router.delete("/:id", CryptoUtils_1.default.checkAuth, this.deleteUser);
         this.router.post("/", this.createNewUser);
     }
 }

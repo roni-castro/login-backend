@@ -1,4 +1,6 @@
 import {Request, Response, NextFunction} from 'express';
+import connection from './MysqlConnection';
+import {UserModel} from './model/UserModel'
 
 const crypto = require('crypto');
 var jwt = require('jsonwebtoken');
@@ -16,21 +18,46 @@ class CryptoUtils{
 
     public createTokenWith = (payloadObject) => {
         // sign with default (HMAC SHA256)
-        var token = jwt.sign(payloadObject, process.env.JWT_SECRET_KEY, {expiresIn: "60"}); // 60 seconds
+        var token = jwt.sign(payloadObject, process.env.JWT_SECRET_KEY, {expiresIn: 120}); // 2 minutes
         return token;
     }
 
     public checkAuth = (req:Request, res:Response, next:NextFunction) => {
         try{
-            let authorizationToken = req.headers.authorization;
-            console.log("authorization: ", authorizationToken);
-            var decoded = jwt.verify(authorizationToken, process.env.JWT_SECRET_KEY);
-            req.body.user = decoded;
-            console.log("decoded: ", decoded);
+            var tokenData = this.decodeToken(req.headers.authorization);
+            this.refreshToken(req, res, next, tokenData);
             next();
         } catch(error){
             res.status(403).json({message: "Authentication failed"});
         }
+    }
+
+    public refreshToken = (req:Request, res:Response, next:NextFunction, tokenData) => {
+        connection.query(
+            "SELECT * FROM tb_user WHERE user_name = ?", 
+            [tokenData.user_name], function(err, results){
+            if(err) {
+                return null;
+            } else {
+                if(results.length == 0){ // User not found
+                    return null;
+                } else {
+                    var userFromDB = results[0];
+                    let user = new UserModel(userFromDB.id, userFromDB.user_name, userFromDB.first_name, userFromDB.last_name);
+                    let newToken = cryptoUtils.createTokenWith({
+                        id: user.id,
+                        user_name: user.userName
+                    });
+                    req.headers.authorization = newToken;
+                    console.log("NEW TOKEN " + newToken);
+                    return newToken;
+                }
+            }
+        })
+    }
+
+    public decodeToken = (tokenToBeDecoded) => {
+        return jwt.verify(tokenToBeDecoded, process.env.JWT_SECRET_KEY);
     }
 }
 

@@ -13,11 +13,13 @@ export class UserRouter {
     }
 
     init(){
-        this.router.get("/", this.getUsers);
+        this.router.get("/", cryptoUtils.checkAuth, this.getUsers);
+        this.router.get("/:id", cryptoUtils.checkAuth, this.getSpecificUser);
+        this.router.delete("/:id", cryptoUtils.checkAuth, this.deleteUser);
         this.router.post("/", this.createNewUser);
     }
 
-    //GET
+    //GET api/user
     public getUsers = (req:Request, res:Response, next:NextFunction) => {
         connection.query("SELECT id, user_name, first_name, last_name FROM tb_user", function(err, users){
             if(err) {
@@ -25,6 +27,40 @@ export class UserRouter {
                 console.log(err);
             } else {
                 res.json(users);
+            }
+        })
+    }
+
+    //DELETE api/user
+    public deleteUser = (req:Request, res:Response, next:NextFunction) => {
+        connection.query("DELETE FROM tb_user WHERE id = ?", [req.params.id], function(err, result){
+            if(err) {
+                res.status(400).json({message: "Error deleting user"});
+                console.log(err);
+            } else {
+                if(result.affectedRows == 0){
+                    res.status(404).json({message: "User not found"});
+                } else {
+                    res.status(204).json({});
+                }
+            }
+        })
+    }
+
+     //GET api/user/id
+     public getSpecificUser = (req:Request, res:Response, next:NextFunction) => {
+        connection.query("SELECT id, user_name, first_name, last_name FROM tb_user WHERE id = ?", [req.params.id],
+         function(err, result){
+            if(err) {
+                res.json({message: "Error getting user"});
+                console.log(err);
+            } else {
+                if(result.length == 0){
+                    res.status(404).json({message: "User not found"});
+                } else {
+                    res.json(result[0]);
+                }
+                
             }
         })
     }
