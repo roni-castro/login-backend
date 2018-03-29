@@ -37,7 +37,10 @@ class LoginRouter {
                     var userData = user[0];
                     let pass = cryptoUtils.decrypt(userData.pass_hash);
                     if(pass == password){
-                        res.status(200).json({"id": userData.id});
+                        res.status(200).json({
+                            "id": userData.id,
+                            "user_name": userData.user_name
+                        });
                     } else{
                         res.status(400).json({message: "Password is not valid"});
                     }
