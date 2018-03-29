@@ -7,7 +7,7 @@ CREATE TABLE tb_user (
     user_name VARCHAR(50) NOT NULL,
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NOT NULL,
-    pass_hash BLOB,
+    pass_hash TEXT,
     CONSTRAINT UC_Login_User UNIQUE (user_name)
 );
 

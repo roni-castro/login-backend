@@ -1,6 +1,7 @@
 import {Router, Request, Response, NextFunction} from 'express';
 import connection from '../MysqlConnection';
 import cryptoUtils from '../CryptoUtils';
+import {UserModel} from '../model/UserModel'
 
 class LoginRouter {
     router: Router
@@ -25,21 +26,31 @@ class LoginRouter {
         }
         // the body of the request is valid
         connection.query(
-            "SELECT id, pass_hash FROM tb_user WHERE user_name = ?", 
-            [userName], function(err, user){
+            "SELECT * FROM tb_user WHERE user_name = ?", 
+            [userName], function(err, results){
             if(err) {
                 res.json({message: "Error quering user"});
                 console.log(err);
             } else {
-                if(user.length == 0){ // User not found
+                if(results.length == 0){ // User not found
                     res.status(400).json({message: "User not found"});
                 } else {
-                    var userData = user[0];
-                    let pass = cryptoUtils.decrypt(userData.pass_hash);
-                    if(pass == password){
+                    var userFromDB = results[0];
+                    let encryptedTypedPassword = cryptoUtils.encrypt(password);
+                    if(encryptedTypedPassword == userFromDB.pass_hash){
+                        let user = new UserModel(userFromDB.id, userFromDB.user_name, userFromDB.first_name, userFromDB.last_name);
+                        let token = cryptoUtils.createTokenWith({
+                            id: user.id,
+                            user_name: user.userName,
+                            first_name: user.firstname,
+                            last_name: user.lastName
+                        });
                         res.status(200).json({
-                            "id": userData.id,
-                            "user_name": userData.user_name
+                            id: user.id,
+                            user_name: user.userName,
+                            first_name: user.firstname,
+                            last_name: user.lastName,
+                            token: token
                         });
                     } else{
                         res.status(400).json({message: "Password is not valid"});
@@ -47,6 +58,25 @@ class LoginRouter {
                 }
             }
         })
+    }
+
+    private generateLoggedInUserToBeReturned = (user: UserModel, token: String) => {
+        return {
+            id: user.id,
+            user_name: user.userName,
+            first_name: user.firstname,
+            last_name: user.lastName,
+            token: token
+        }
+    }
+
+    private generateLoggedInUserToBeUsedOnToken = (user: UserModel) => {
+        return {
+            id: user.id,
+            user_name: user.userName,
+            first_name: user.firstname,
+            last_name: user.lastName
+        }
     }
 
     private setUpUnableToLoginErrors = (userName: String, password: String) => {
