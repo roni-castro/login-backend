@@ -68,14 +68,6 @@ class LoginRouter {
             return false;
         }
     }
-
-    private isValidToCreateNewUser = (userName: String, firstName:String, lastName:String, password: String) => {
-        if(userName && firstName && lastName && password){
-            return true;
-        } else{
-            return false;
-        }
-    }
 }
 
 // Create the LoginRouter, and export its configured Express.Router

@@ -58,14 +58,6 @@ class LoginRouter {
                 return false;
             }
         };
-        this.isValidToCreateNewUser = (userName, firstName, lastName, password) => {
-            if (userName && firstName && lastName && password) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
         this.router = express_1.Router();
         this.init();
     }

@@ -31,8 +31,12 @@ class UserRouter {
                 let encryptedPass = CryptoUtils_1.default.encrypt(password);
                 MysqlConnection_1.default.query("INSERT INTO tb_user (user_name, first_name, last_name, pass_hash) VALUES (?, ?, ?, ?)", [userName, firstName, lastName, encryptedPass], function (err, newUser) {
                     if (err) {
-                        console.log(err);
-                        return res.json({ message: "Error creating user" });
+                        if (err.code === 'ER_DUP_ENTRY') {
+                            return res.json({ message: "User already exists" });
+                        }
+                        else {
+                            return res.json({ message: "Error creating user" });
+                        }
                     }
                     else {
                         return res.status(200).json(newUser[0]);
