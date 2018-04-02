@@ -18,6 +18,7 @@ describe('POST api/session', () => {
         .then(res => {
             expect(res.status).to.equal(200);
             expect(res).to.be.json;
+            expect(res.body.token).to.not.empty;
         });
     });
 
