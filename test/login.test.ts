@@ -12,8 +12,8 @@ describe('POST api/session', () => {
         return chai.request(app)
         .post('/api/session')
         .send({
-            "user_name": "roni1",
-            "password": "123"
+            "user_name": "admin",
+            "password": "admin"
         })
         .then(res => {
             expect(res.status).to.equal(200);
@@ -21,11 +21,11 @@ describe('POST api/session', () => {
         });
     });
 
-    it('should return error message', () => {
+    it('should return error message because its missing password', () => {
         return chai.request(app)
         .post('/api/session')
         .send({
-            "user_name": "roni1"
+            "user_name": "admin"
         })
         .then(res => {
             expect(res.status).to.equal(400);
