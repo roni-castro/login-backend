@@ -2,6 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import connection from '../MysqlConnection';
 import cryptoUtils from '../CryptoUtils';
 import {UserModel} from '../model/UserModel'
+import userDbController from '../controllers/UserDbController'
 
 class LoginRouter {
     router: Router
@@ -17,7 +18,7 @@ class LoginRouter {
     }
 
     // POST
-    public login = (req:Request, res:Response, next:NextFunction) => {
+    public login = async (req:Request, res:Response, next:NextFunction) => {
         let userName:String = req.body.user_name;
         let password:String = req.body.password;
 
@@ -25,37 +26,29 @@ class LoginRouter {
             return res.status(400).json(this.setUpUnableToLoginErrors(userName, password));
         }
         // the body of the request is valid
-        connection.query(
-            "SELECT * FROM tb_user WHERE user_name = ?", 
-            [userName], function(err, results){
-            if(err) {
-                res.json({message: "Error quering user"});
-                console.log(err);
+        try{
+            let user:UserModel = await userDbController.findUserByUserNameId(userName);
+            if(user == null){ // User not found
+                res.status(400).json({message: "User not found"});
             } else {
-                if(results.length == 0){ // User not found
-                    res.status(400).json({message: "User not found"});
-                } else {
-                    var userFromDB = results[0];
-                    let encryptedTypedPassword = cryptoUtils.encrypt(password);
-                    if(encryptedTypedPassword == userFromDB.pass_hash){
-                        let user = new UserModel(userFromDB.id, userFromDB.user_name, userFromDB.first_name, userFromDB.last_name);
-                        let token = cryptoUtils.createTokenWith({
-                            id: user.id,
-                            user_name: user.userName
-                        });
-                        res.status(200).json({
-                            id: user.id,
-                            user_name: user.userName,
-                            first_name: user.firstname,
-                            last_name: user.lastName,
-                            token: token
-                        });
-                    } else{
-                        res.status(400).json({message: "Password is not valid"});
-                    }
+                let encryptedTypedPassword = cryptoUtils.encrypt(password);
+                if(encryptedTypedPassword == user.passHash){
+                    let token = cryptoUtils.createTokenToUser(user);
+                    res.status(200).json({
+                        id: user.id,
+                        user_name: user.userName,
+                        first_name: user.firstname,
+                        last_name: user.lastName,
+                        token: token
+                    });
+                } else{
+                    res.status(400).json({message: "Password is not valid"});
                 }
             }
-        })
+        } catch(error){
+            console.log(error);
+            res.json({message: "Error quering user"});
+        }
     }
 
     private generateLoggedInUserToBeReturned = (user: UserModel, token: String) => {

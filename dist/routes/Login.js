@@ -1,53 +1,54 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const MysqlConnection_1 = require("../MysqlConnection");
 const CryptoUtils_1 = require("../CryptoUtils");
-const UserModel_1 = require("../model/UserModel");
+const UserDbController_1 = require("../controllers/UserDbController");
 class LoginRouter {
     // Initialize the LoginRouter
     constructor() {
         // POST
-        this.login = (req, res, next) => {
+        this.login = (req, res, next) => __awaiter(this, void 0, void 0, function* () {
             let userName = req.body.user_name;
             let password = req.body.password;
             if (!this.isValidLoginCredentials(userName, password)) {
                 return res.status(400).json(this.setUpUnableToLoginErrors(userName, password));
             }
             // the body of the request is valid
-            MysqlConnection_1.default.query("SELECT * FROM tb_user WHERE user_name = ?", [userName], function (err, results) {
-                if (err) {
-                    res.json({ message: "Error quering user" });
-                    console.log(err);
+            try {
+                let user = yield UserDbController_1.default.findUserByUserNameId(userName);
+                if (user == null) { // User not found
+                    res.status(400).json({ message: "User not found" });
                 }
                 else {
-                    if (results.length == 0) { // User not found
-                        res.status(400).json({ message: "User not found" });
+                    let encryptedTypedPassword = CryptoUtils_1.default.encrypt(password);
+                    if (encryptedTypedPassword == user.passHash) {
+                        let token = CryptoUtils_1.default.createTokenToUser(user);
+                        res.status(200).json({
+                            id: user.id,
+                            user_name: user.userName,
+                            first_name: user.firstname,
+                            last_name: user.lastName,
+                            token: token
+                        });
                     }
                     else {
-                        var userFromDB = results[0];
-                        let encryptedTypedPassword = CryptoUtils_1.default.encrypt(password);
-                        if (encryptedTypedPassword == userFromDB.pass_hash) {
-                            let user = new UserModel_1.UserModel(userFromDB.id, userFromDB.user_name, userFromDB.first_name, userFromDB.last_name);
-                            let token = CryptoUtils_1.default.createTokenWith({
-                                id: user.id,
-                                user_name: user.userName
-                            });
-                            res.status(200).json({
-                                id: user.id,
-                                user_name: user.userName,
-                                first_name: user.firstname,
-                                last_name: user.lastName,
-                                token: token
-                            });
-                        }
-                        else {
-                            res.status(400).json({ message: "Password is not valid" });
-                        }
+                        res.status(400).json({ message: "Password is not valid" });
                     }
                 }
-            });
-        };
+            }
+            catch (error) {
+                console.log(error);
+                res.json({ message: "Error quering user" });
+            }
+        });
         this.generateLoggedInUserToBeReturned = (user, token) => {
             return {
                 id: user.id,

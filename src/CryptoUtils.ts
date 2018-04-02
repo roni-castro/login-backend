@@ -1,12 +1,15 @@
 import {Request, Response, NextFunction} from 'express';
 import connection from './MysqlConnection';
-import {UserModel} from './model/UserModel'
+import {UserModel} from './model/UserModel';
+import userDbController from './controllers/UserDbController';
+
 
 const crypto = require('crypto');
 var jwt = require('jsonwebtoken');
 require('dotenv').config()
 
 class CryptoUtils{
+    private expirationTime: Number = 120;
 
     public encrypt = (dataToBeEncrypted: String): String => {
         let passwordSecret = process.env.LOGIN_CIPHER_KEY;
@@ -16,10 +19,18 @@ class CryptoUtils{
         return crypted;
     }
 
-    public createTokenWith = (payloadObject) => {
-        // sign with default (HMAC SHA256)
-        var token = jwt.sign(payloadObject, process.env.JWT_SECRET_KEY, {expiresIn: 120}); // 2 minutes
+     // sign with default (HMAC SHA256)
+    public createTokenToUser = (user: UserModel) => {
+        let payloadObject = this.createTokenPayload(user);
+        var token = jwt.sign(payloadObject, process.env.JWT_SECRET_KEY, {expiresIn: this.expirationTime}); // 2 minutes
         return token;
+    }
+
+    private createTokenPayload = (user: UserModel) => {
+        return {
+            id: user.id,
+            user_name: user.userName
+        }
     }
 
     public checkAuth = (req:Request, res:Response, next:NextFunction) => {
@@ -32,28 +43,21 @@ class CryptoUtils{
         }
     }
 
-    public refreshToken = (req:Request, res:Response, next:NextFunction, tokenData) => {
-        connection.query(
-            "SELECT * FROM tb_user WHERE user_name = ?", 
-            [tokenData.user_name], function(err, results){
-            if(err) {
+    public refreshToken = async (req:Request, res:Response, next:NextFunction, tokenData) => {
+        try{
+            console.log(tokenData.user_name);
+            let user:UserModel = await userDbController.findUserByUserNameId(tokenData.user_name);
+            if(!user){ // User not found
+                console.log("User corresponding to the token was not found");
                 return null;
             } else {
-                if(results.length == 0){ // User not found
-                    return null;
-                } else {
-                    var userFromDB = results[0];
-                    let user = new UserModel(userFromDB.id, userFromDB.user_name, userFromDB.first_name, userFromDB.last_name);
-                    let newToken = cryptoUtils.createTokenWith({
-                        id: user.id,
-                        user_name: user.userName
-                    });
-                    req.headers.authorization = newToken;
-                    console.log("NEW TOKEN " + newToken);
-                    return newToken;
-                }
+                let newToken = cryptoUtils.createTokenToUser(user);
+                res.header('Authorization', newToken);
+                return newToken;
             }
-        })
+        } catch(error){
+            return null;
+        }
     }
 
     public decodeToken = (tokenToBeDecoded) => {
