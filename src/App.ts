@@ -5,6 +5,7 @@ import * as bodyParser from 'body-parser';
 import LoginRouter from './routes/Login';
 import UserRouter from './routes/User';
 import cryptoUtils from './CryptoUtils';
+import "reflect-metadata";
 
 class App{
 
