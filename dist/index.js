@@ -4,7 +4,7 @@ const http = require("http");
 const debug = require("debug");
 const App_1 = require("./App");
 const port = (process.env.PORT || 3000);
-App_1.default.set('port', port);
+//App.set('port', port);
 const server = http.createServer(App_1.default);
 server.listen(port);
 server.on('error', onErrorListener);

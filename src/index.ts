@@ -4,7 +4,7 @@ import * as debug from 'debug';
 import App from './App';
 
 const port  = (process.env.PORT || 3000);
-App.set('port', port);
+//App.set('port', port);
 const server = http.createServer(App)
 server.listen(port);
 server.on('error', onErrorListener);
