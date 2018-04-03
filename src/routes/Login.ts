@@ -1,7 +1,7 @@
 import {Router, Request, Response, NextFunction} from 'express';
 import connection from '../MysqlConnection';
 import cryptoUtils from '../CryptoUtils';
-import {UserModel} from '../model/UserModel'
+import {UserModel} from '../entity/UserModel'
 import userDbController from '../controllers/UserDbController'
 
 class LoginRouter {

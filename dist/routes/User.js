@@ -8,7 +8,7 @@ class UserRouter {
     constructor() {
         //GET api/user
         this.getUsers = (req, res, next) => {
-            MysqlConnection_1.default.query("SELECT id, user_name, first_name, last_name FROM tb_user", function (err, users) {
+            MysqlConnection_1.default.query("SELECT id, user_name, first_name, last_name FROM UserModel", function (err, users) {
                 if (err) {
                     res.json({ message: "Error getting users" });
                     console.log(err);
@@ -20,7 +20,7 @@ class UserRouter {
         };
         //DELETE api/user
         this.deleteUser = (req, res, next) => {
-            MysqlConnection_1.default.query("DELETE FROM tb_user WHERE id = ?", [req.params.id], function (err, result) {
+            MysqlConnection_1.default.query("DELETE FROM UserModel WHERE id = ?", [req.params.id], function (err, result) {
                 if (err) {
                     res.status(400).json({ message: "Error deleting user" });
                     console.log(err);
@@ -37,7 +37,7 @@ class UserRouter {
         };
         //GET api/user/id
         this.getSpecificUser = (req, res, next) => {
-            MysqlConnection_1.default.query("SELECT id, user_name, first_name, last_name FROM tb_user WHERE id = ?", [req.params.id], function (err, result) {
+            MysqlConnection_1.default.query("SELECT id, user_name, first_name, last_name FROM UserModel WHERE id = ?", [req.params.id], function (err, result) {
                 if (err) {
                     res.json({ message: "Error getting user" });
                     console.log(err);
@@ -63,7 +63,7 @@ class UserRouter {
             // the body of the request is valid
             try {
                 let encryptedPass = CryptoUtils_1.default.encrypt(password);
-                MysqlConnection_1.default.query("INSERT INTO tb_user (user_name, first_name, last_name, pass_hash) VALUES (?, ?, ?, ?)", [userName, firstName, lastName, encryptedPass], function (err, newUser) {
+                MysqlConnection_1.default.query("INSERT INTO UserModel (user_name, first_name, last_name, pass_hash) VALUES (?, ?, ?, ?)", [userName, firstName, lastName, encryptedPass], function (err, newUser) {
                     if (err) {
                         if (err.code === 'ER_DUP_ENTRY') {
                             return res.status(400).json({ message: "User already exists" });

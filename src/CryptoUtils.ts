@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction} from 'express';
 import connection from './MysqlConnection';
-import {UserModel} from './model/UserModel';
+import {UserModel} from './entity/UserModel';
 import userDbController from './controllers/UserDbController';
 
 

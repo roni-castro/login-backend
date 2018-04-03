@@ -5,6 +5,7 @@ const logger = require("morgan");
 const bodyParser = require("body-parser");
 const Login_1 = require("./routes/Login");
 const User_1 = require("./routes/User");
+require("reflect-metadata");
 class App {
     constructor() {
         this.express = express();

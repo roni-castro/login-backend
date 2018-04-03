@@ -1,12 +1,12 @@
 import connection from '../MysqlConnection';
-import {UserModel} from '../model/UserModel'
+import {UserModel} from '../entity/UserModel'
 
 class UserDbController {
 
     public findUserByUserNameId = (userName): Promise<UserModel> => {
         return new Promise<UserModel>((resolve, reject) => {
             connection.query(
-                "SELECT * FROM tb_user WHERE user_name = ?", 
+                "SELECT * FROM UserModel WHERE user_name = ?", 
                 [userName], function(err, results){
                 if(err) {
                     return reject(err);

@@ -21,7 +21,7 @@ export class UserRouter {
 
     //GET api/user
     public getUsers = (req:Request, res:Response, next:NextFunction) => {
-        connection.query("SELECT id, user_name, first_name, last_name FROM tb_user", function(err, users){
+        connection.query("SELECT id, user_name, first_name, last_name FROM UserModel", function(err, users){
             if(err) {
                 res.json({message: "Error getting users"});
                 console.log(err);
@@ -33,7 +33,7 @@ export class UserRouter {
 
     //DELETE api/user
     public deleteUser = (req:Request, res:Response, next:NextFunction) => {
-        connection.query("DELETE FROM tb_user WHERE id = ?", [req.params.id], function(err, result){
+        connection.query("DELETE FROM UserModel WHERE id = ?", [req.params.id], function(err, result){
             if(err) {
                 res.status(400).json({message: "Error deleting user"});
                 console.log(err);
@@ -49,7 +49,7 @@ export class UserRouter {
 
      //GET api/user/id
      public getSpecificUser = (req:Request, res:Response, next:NextFunction) => {
-        connection.query("SELECT id, user_name, first_name, last_name FROM tb_user WHERE id = ?", [req.params.id],
+        connection.query("SELECT id, user_name, first_name, last_name FROM UserModel WHERE id = ?", [req.params.id],
          function(err, result){
             if(err) {
                 res.json({message: "Error getting user"});
@@ -78,7 +78,7 @@ export class UserRouter {
         try{
             let encryptedPass = cryptoUtils.encrypt(password);
             connection.query(
-                "INSERT INTO tb_user (user_name, first_name, last_name, pass_hash) VALUES (?, ?, ?, ?)", 
+                "INSERT INTO UserModel (user_name, first_name, last_name, pass_hash) VALUES (?, ?, ?, ?)", 
                 [userName, firstName, lastName, encryptedPass], function(err, newUser){
                 if(err) {
                     if(err.code === 'ER_DUP_ENTRY') {

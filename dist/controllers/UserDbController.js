@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const MysqlConnection_1 = require("../MysqlConnection");
-const UserModel_1 = require("../model/UserModel");
+const UserModel_1 = require("../entity/UserModel");
 class UserDbController {
     constructor() {
         this.findUserByUserNameId = (userName) => {
             return new Promise((resolve, reject) => {
-                MysqlConnection_1.default.query("SELECT * FROM tb_user WHERE user_name = ?", [userName], function (err, results) {
+                MysqlConnection_1.default.query("SELECT * FROM UserModel WHERE user_name = ?", [userName], function (err, results) {
                     if (err) {
                         return reject(err);
                     }
