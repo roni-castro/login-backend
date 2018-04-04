@@ -1,0 +1,21 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var ErrorType;
+(function (ErrorType) {
+    ErrorType[ErrorType["AuthenticationError"] = 0] = "AuthenticationError";
+    ErrorType[ErrorType["BadRequestError"] = 1] = "BadRequestError";
+    ErrorType[ErrorType["CustomError"] = 2] = "CustomError";
+    ErrorType[ErrorType["DataSourceError"] = 3] = "DataSourceError";
+    ErrorType[ErrorType["DataValidationError"] = 4] = "DataValidationError";
+    ErrorType[ErrorType["ExistingDataError"] = 5] = "ExistingDataError";
+    ErrorType[ErrorType["GraphQLError"] = 6] = "GraphQLError";
+    ErrorType[ErrorType["JwtValidationError"] = 7] = "JwtValidationError";
+    ErrorType[ErrorType["NotFoundError"] = 8] = "NotFoundError";
+    ErrorType[ErrorType["ParameterRequiredError"] = 9] = "ParameterRequiredError";
+    ErrorType[ErrorType["ParameterParseJsonError"] = 10] = "ParameterParseJsonError";
+    ErrorType[ErrorType["RepositoryError"] = 11] = "RepositoryError";
+    ErrorType[ErrorType["SchemaValidationError"] = 12] = "SchemaValidationError";
+    ErrorType[ErrorType["EmailError"] = 13] = "EmailError";
+    ErrorType[ErrorType["TypeError"] = 14] = "TypeError";
+    ErrorType[ErrorType["ValidationError"] = 15] = "ValidationError";
+})(ErrorType = exports.ErrorType || (exports.ErrorType = {}));

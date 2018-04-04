@@ -1,0 +1,18 @@
+export enum ErrorType {
+  AuthenticationError,
+  BadRequestError,
+  CustomError,
+  DataSourceError,
+  DataValidationError,
+  ExistingDataError,
+  GraphQLError,
+  JwtValidationError,
+  NotFoundError,
+  ParameterRequiredError,
+  ParameterParseJsonError,
+  RepositoryError,
+  SchemaValidationError,
+  EmailError,
+  TypeError,
+  ValidationError,
+}

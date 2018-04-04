@@ -1,35 +1,38 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express = require("express");
-const logger = require("morgan");
-const bodyParser = require("body-parser");
-const Login_1 = require("./routes/Login");
-const User_1 = require("./routes/User");
 require("reflect-metadata");
+const express = require("express");
+// import * as bodyParser from 'body-parser';
+const routing_controllers_1 = require("routing-controllers");
+const typeorm_1 = require("typeorm");
+const typedi_1 = require("typedi");
+const MysqlConnection_1 = require("./MysqlConnection");
+routing_controllers_1.useContainer(typedi_1.Container);
+typeorm_1.useContainer(typedi_1.Container);
 class App {
-    constructor() {
-        this.express = express();
-        this.middleware();
-        this.routes();
-    }
-    // Express middleware
-    middleware() {
-        this.express.use(logger('dev'));
-        this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({ extended: false }));
-    }
-    // Link up API endpoints and route handlers
-    routes() {
-        let router = express.Router();
-        router.get("/", (req, res, next) => {
-            res.json({
-                message: 'Home'
+    createServer() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let app = express(); // your created express server
+            routing_controllers_1.useExpressServer(app, {
+                routePrefix: "/api",
+                middlewares: [__dirname + "/middlewares/**/*.js"],
+                controllers: [__dirname + "/controllers/**/*.js"]
             });
+            let connection = yield this.createDBConnection();
+            return app;
         });
-        this.express.use("/api", router);
-        this.express.use("/api/session", Login_1.default);
-        this.express.use("/api/user", User_1.default);
+    }
+    createDBConnection() {
+        return new MysqlConnection_1.MysqlConnection().configureDB();
     }
 }
 const app = new App();
-exports.default = app.express;
+exports.default = app.createServer();

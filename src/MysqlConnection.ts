@@ -1,20 +1,16 @@
 //var mysql  = require ('mysql');
-require('dotenv').config()
+//require('dotenv').config()
 import { DbConnection } from './connection';
 import { createConnection, Connection} from 'typeorm';
 import {UserModel} from "./entity/UserModel";
 
-class MysqlConnection{
+export class MysqlConnection{
 
-  public async configureDB(){
+  public async configureDB(): Promise<Connection>{
     console.info('Will connect to DB');
-    let connection = await createConnection(DbConnection.getConnectionOptions());
+    let connection = await createConnection(DbConnection.getConnectionOptions()).catch(console.log).then(() => null);
     console.info('Connected to ORM database!');
     return connection;
   }
 }
-
-let connection:Promise<Connection> = new MysqlConnection().configureDB();
-
-export default connection;
 

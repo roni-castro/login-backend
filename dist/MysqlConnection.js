@@ -9,18 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 //var mysql  = require ('mysql');
-require('dotenv').config();
+//require('dotenv').config()
 const connection_1 = require("./connection");
 const typeorm_1 = require("typeorm");
 class MysqlConnection {
     configureDB() {
         return __awaiter(this, void 0, void 0, function* () {
             console.info('Will connect to DB');
-            let connection = yield typeorm_1.createConnection(connection_1.DbConnection.getConnectionOptions());
+            let connection = yield typeorm_1.createConnection(connection_1.DbConnection.getConnectionOptions()).catch(console.log).then(() => null);
             console.info('Connected to ORM database!');
             return connection;
         });
     }
 }
-let connection = new MysqlConnection().configureDB();
-exports.default = connection;
+exports.MysqlConnection = MysqlConnection;

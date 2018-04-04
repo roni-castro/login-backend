@@ -1,43 +1,31 @@
-import * as path from 'path'; //provides utilities for working with file and directory paths
+import  "reflect-metadata";
 import * as express from 'express';
-import * as logger from 'morgan';
-import * as bodyParser from 'body-parser';
-import LoginRouter from './routes/Login';
-import UserRouter from './routes/User';
-import cryptoUtils from './CryptoUtils';
-import "reflect-metadata";
+// import * as bodyParser from 'body-parser';
+import {useExpressServer, useContainer} from "routing-controllers";
+import {useContainer as useContainerTypeOrm} from 'typeorm'
+import {Container} from "typedi";
+import { MysqlConnection} from './MysqlConnection';
+
+useContainer(Container);
+useContainerTypeOrm(Container);
 
 class App{
-
-    //holds a reference to Express instance
-    public express: express.Application;
-
-    constructor() {
-        this.express = express();
-        this.middleware();
-        this.routes();
-    }
-
-    // Express middleware
-    private middleware(): void{
-        this.express.use(logger('dev'));
-        this.express.use(bodyParser.json());
-        this.express.use(bodyParser.urlencoded({extended: false}));
-    }
-
-    // Link up API endpoints and route handlers
-    private routes(): void{
-        let router = express.Router();
-        router.get("/", (req, res, next) => {
-            res.json({
-                message: 'Home'
-            });
+    
+    public async createServer () {
+        let app = express(); // your created express server
+        useExpressServer(app, { // register created express server in routing-controllers
+            routePrefix: "/api",
+            middlewares: [__dirname + "/middlewares/**/*.js"],
+            controllers: [__dirname + "/controllers/**/*.js"]
         });
-        this.express.use("/api", router);
-        this.express.use("/api/session", LoginRouter);
-        this.express.use("/api/user", UserRouter);
+        let connection = await this.createDBConnection();
+        return app;
+    }
+
+    public createDBConnection(){
+        return new MysqlConnection().configureDB();
     }
 }
 
 const app = new App()
-export default app.express;
+export default app.createServer();

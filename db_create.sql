@@ -11,6 +11,6 @@ CREATE TABLE UserModel (
     CONSTRAINT UC_Login_User UNIQUE (user_name)
 );
 
-SELECT * FROM UserModel;
+SELECT * FROM user_model;
 
 

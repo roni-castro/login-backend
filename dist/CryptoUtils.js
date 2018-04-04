@@ -8,7 +8,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const UserDbController_1 = require("./controllers/UserDbController");
 const crypto = require('crypto');
 var jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -23,15 +22,15 @@ class CryptoUtils {
             return crypted;
         };
         // sign with default (HMAC SHA256)
-        this.createTokenToUser = (user) => {
-            let payloadObject = this.createTokenPayload(user);
+        this.createTokenToUser = (userId, userName) => {
+            let payloadObject = this.createTokenPayload(userId, userName);
             var token = jwt.sign(payloadObject, process.env.JWT_SECRET_KEY, { expiresIn: this.expirationTime }); // 2 minutes
             return token;
         };
-        this.createTokenPayload = (user) => {
+        this.createTokenPayload = (userId, userName) => {
             return {
-                id: user.id,
-                user_name: user.userName
+                id: userId,
+                user_name: userName
             };
         };
         this.checkAuth = (req, res, next) => {
@@ -45,22 +44,20 @@ class CryptoUtils {
             }
         };
         this.refreshToken = (req, res, next, tokenData) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                console.log(tokenData.user_name);
-                let user = yield UserDbController_1.default.findUserByUserNameId(tokenData.user_name);
-                if (!user) { // User not found
-                    console.log("User corresponding to the token was not found");
-                    return null;
-                }
-                else {
-                    let newToken = cryptoUtils.createTokenToUser(user);
-                    res.header('Authorization', newToken);
-                    return newToken;
-                }
-            }
-            catch (error) {
-                return null;
-            }
+            //try{
+            //console.log(tokenData.user_name);
+            // let user:UserModel = await userDbController.findUserByUserNameId(tokenData.user_name);
+            // if(!user){ // User not found
+            //     console.log("User corresponding to the token was not found");
+            //     return null;
+            // } else {
+            let newToken = cryptoUtils.createTokenToUser(tokenData.id, tokenData.user_name);
+            res.header('Authorization', newToken);
+            return newToken;
+            // }
+            // } catch(error){
+            //     return null;
+            // }
         });
         this.decodeToken = (tokenToBeDecoded) => {
             return jwt.verify(tokenToBeDecoded, process.env.JWT_SECRET_KEY);
