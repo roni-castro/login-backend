@@ -1,17 +1,29 @@
+import {Entity, Column, PrimaryGeneratedColumn} from "typeorm";
 
-export class UserModel{
+@Entity()
+export class UserModel {
+
+    @PrimaryGeneratedColumn()
     id: number;
-    userName: String;
-    firstname: String;
-    lastName: String;
-    passHash: String;
+
+    @Column("varchar", {nullable: false, unique: true })
+    userName: string;
+
+    @Column("varchar")
+    firstName: string;
+
+    @Column("varchar")
+    lastName: string;
+
+    @Column("varchar", {nullable: false})
+    passHash: string;
 
     constructor();
-    constructor(id: number, userName: String, firstname: String, lastName: String, passHash: String);
-    constructor(id?: number, userName?: String, firstname?: String, lastName?: String, passHash?: String){
+    constructor(id: number, userName: string, firstName: string, lastName: string, passHash: string);
+    constructor(id?: number, userName?: string, firstName?: string, lastName?: string, passHash?: string){
         this.id = id;
         this.userName = userName;
-        this.firstname = firstname;
+        this.firstName = firstName;
         this.lastName = lastName;
         this.passHash = passHash;
     }

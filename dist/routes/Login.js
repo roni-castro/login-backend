@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const CryptoUtils_1 = require("../CryptoUtils");
-const UserDbController_1 = require("../controllers/UserDbController");
+const UserRepository_1 = require("../data/UserRepository");
 class LoginRouter {
     // Initialize the LoginRouter
     constructor() {
@@ -21,51 +21,29 @@ class LoginRouter {
             if (!this.isValidLoginCredentials(userName, password)) {
                 return res.status(400).json(this.setUpUnableToLoginErrors(userName, password));
             }
-            // the body of the request is valid
-            try {
-                let user = yield UserDbController_1.default.findUserByUserNameId(userName);
-                if (user == null) { // User not found
-                    res.status(400).json({ message: "User not found" });
+            let user = yield new UserRepository_1.UserRepository().findUserByUserName(userName)
+                .then(function (user) {
+                console.log('Got the final result: ' + user);
+                let encryptedTypedPassword = CryptoUtils_1.default.encrypt(password);
+                if (encryptedTypedPassword == user.passHash) {
+                    let token = CryptoUtils_1.default.createTokenToUser(user);
+                    res.status(200).json({
+                        id: user.id,
+                        user_name: user.userName,
+                        first_name: user.firstName,
+                        last_name: user.lastName,
+                        token: token
+                    });
                 }
                 else {
-                    let encryptedTypedPassword = CryptoUtils_1.default.encrypt(password);
-                    if (encryptedTypedPassword == user.passHash) {
-                        let token = CryptoUtils_1.default.createTokenToUser(user);
-                        res.status(200).json({
-                            id: user.id,
-                            user_name: user.userName,
-                            first_name: user.firstname,
-                            last_name: user.lastName,
-                            token: token
-                        });
-                    }
-                    else {
-                        res.status(400).json({ message: "Password is not valid" });
-                    }
+                    res.status(400).json({ message: "Password is not valid" });
                 }
-            }
-            catch (error) {
+            })
+                .catch(function (error) {
                 console.log(error);
-                res.json({ message: "Error quering user" });
-            }
+                res.status(400).json({ message: "User not found" });
+            });
         });
-        this.generateLoggedInUserToBeReturned = (user, token) => {
-            return {
-                id: user.id,
-                user_name: user.userName,
-                first_name: user.firstname,
-                last_name: user.lastName,
-                token: token
-            };
-        };
-        this.generateLoggedInUserToBeUsedOnToken = (user) => {
-            return {
-                id: user.id,
-                user_name: user.userName,
-                first_name: user.firstname,
-                last_name: user.lastName
-            };
-        };
         this.setUpUnableToLoginErrors = (userName, password) => {
             var errors = [];
             if (!userName) {

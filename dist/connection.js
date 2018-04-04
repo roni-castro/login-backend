@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const path = require("path");
 class DbConnection {
     static getConnectionOptions(autoSchemaSync = false) {
+        console.log(__dirname + "/entity/*.js");
         const connectionOptions = {
             type: 'mysql',
             host: process.env.DB_HOST,
@@ -10,11 +10,14 @@ class DbConnection {
             database: process.env.DB_SCHEMA,
             username: process.env.DB_USER_NAME,
             password: process.env.DB_PASSWORD,
-            entities: [
-                path.join(__dirname, '..') + "src/entity/**/*.ts",
+            "entities": [
+                __dirname + "/entity/*.js"
             ],
-            migrations: [
-                path.join(__dirname, '.') + "src/migration/**/*.ts",
+            "subscribers": [
+                __dirname + "/subscriber/*.js"
+            ],
+            "migrations": [
+                __dirname + "migration/*.js"
             ],
             synchronize: true
         };

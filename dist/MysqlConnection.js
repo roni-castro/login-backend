@@ -1,17 +1,26 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-var mysql = require('mysql');
+//var mysql  = require ('mysql');
 require('dotenv').config();
-var connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    database: process.env.DB_SCHEMA,
-    user: process.env.DB_USER_NAME,
-    password: process.env.DB_PASSWORD
-});
-connection.connect(function (err) {
-    if (err)
-        console.log(err);
-    else
-        console.log("Connected!");
-});
+const connection_1 = require("./connection");
+const typeorm_1 = require("typeorm");
+class MysqlConnection {
+    configureDB() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.info('Will connect to DB');
+            let connection = yield typeorm_1.createConnection(connection_1.DbConnection.getConnectionOptions());
+            console.info('Connected to ORM database!');
+            return connection;
+        });
+    }
+}
+let connection = new MysqlConnection().configureDB();
 exports.default = connection;

@@ -6,8 +6,6 @@ import LoginRouter from './routes/Login';
 import UserRouter from './routes/User';
 import cryptoUtils from './CryptoUtils';
 import "reflect-metadata";
-import { DbConnection } from './connection';
-import { createConnection} from 'typeorm';
 
 class App{
 
@@ -39,15 +37,7 @@ class App{
         this.express.use("/api/session", LoginRouter);
         this.express.use("/api/user", UserRouter);
     }
-
-    public async configureDB(){
-        console.info('Will connect to DB');
-        await createConnection(DbConnection.getConnectionOptions());
-        console.info('Connected to database!');
-    }
 }
 
 const app = new App()
-app.configureDB();
-
 export default app.express;

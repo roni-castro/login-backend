@@ -1,17 +1,20 @@
-var mysql  = require ('mysql');
+//var mysql  = require ('mysql');
 require('dotenv').config()
+import { DbConnection } from './connection';
+import { createConnection, Connection} from 'typeorm';
+import {UserModel} from "./entity/UserModel";
 
-var connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  database: process.env.DB_SCHEMA,
-  user: process.env.DB_USER_NAME,
-  password: process.env.DB_PASSWORD
-});
-  
-connection.connect(function(err) {
-  if (err) console.log(err);
-  else console.log("Connected!");
-});
+class MysqlConnection{
+
+  public async configureDB(){
+    console.info('Will connect to DB');
+    let connection = await createConnection(DbConnection.getConnectionOptions());
+    console.info('Connected to ORM database!');
+    return connection;
+  }
+}
+
+let connection:Promise<Connection> = new MysqlConnection().configureDB();
 
 export default connection;
 
