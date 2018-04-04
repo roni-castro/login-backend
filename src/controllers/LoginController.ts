@@ -8,9 +8,7 @@ import {BodyParam, Post, JsonController} from 'routing-controllers';
 @JsonController()
 export class LoginController {
 
-    constructor(private readonly loginUseCase: LoginUseCase){
-        console.log('controller')
-    }
+    constructor(private readonly loginUseCase: LoginUseCase){}
 
     @Post("/session")
     async login(

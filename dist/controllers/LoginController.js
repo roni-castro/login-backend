@@ -26,7 +26,6 @@ const routing_controllers_1 = require("routing-controllers");
 let LoginController = class LoginController {
     constructor(loginUseCase) {
         this.loginUseCase = loginUseCase;
-        console.log('controller');
     }
     login(userName, password) {
         return __awaiter(this, void 0, void 0, function* () {

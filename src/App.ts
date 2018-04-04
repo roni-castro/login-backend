@@ -4,7 +4,7 @@ import * as express from 'express';
 import {useExpressServer, useContainer} from "routing-controllers";
 import {useContainer as useContainerTypeOrm} from 'typeorm'
 import {Container} from "typedi";
-import { MysqlConnection} from './MysqlConnection';
+import { MysqlConnection} from './data/MysqlConnection';
 
 useContainer(Container);
 useContainerTypeOrm(Container);

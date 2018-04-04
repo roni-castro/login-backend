@@ -3,6 +3,7 @@ import {Repository} from "typeorm";
 import { UserModel } from "../entity/UserModel";
 import { OrmRepository } from 'typeorm-typedi-extensions';
 import cryptoUtils from '../CryptoUtils';
+
 @Service()
 export class UserRepository {
 

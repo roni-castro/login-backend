@@ -6,7 +6,7 @@ declare var __dirname;
 export class DbConnection {
 
   public static getConnectionOptions( autoSchemaSync: boolean = false): ConnectionOptions {
-console.log(__dirname + "/entity/*.js")
+    console.log(path.join(__dirname, '..') + '/entity/*.{ts,js}')
     const connectionOptions: ConnectionOptions = {
       type: 'mysql',
       host: process.env.DB_HOST,
@@ -15,13 +15,13 @@ console.log(__dirname + "/entity/*.js")
       username: process.env.DB_USER_NAME,
       password: process.env.DB_PASSWORD,
       "entities": [ 
-        __dirname + "/entity/*.js"
+        path.join(__dirname, '..') + '/entity/*.{ts,js}'
       ],
       "subscribers": [
-        __dirname + "/subscriber/*.js"
+        path.join(__dirname, '..') + '/subscriber/*.{ts,js}'
       ],
       "migrations": [
-        __dirname + "migration/*.js"
+        path.join(__dirname, '..') + '/migration/*.{ts,js}'
       ],
       synchronize: true
     };

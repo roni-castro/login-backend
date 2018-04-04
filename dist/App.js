@@ -14,7 +14,7 @@ const express = require("express");
 const routing_controllers_1 = require("routing-controllers");
 const typeorm_1 = require("typeorm");
 const typedi_1 = require("typedi");
-const MysqlConnection_1 = require("./MysqlConnection");
+const MysqlConnection_1 = require("./data/MysqlConnection");
 routing_controllers_1.useContainer(typedi_1.Container);
 typeorm_1.useContainer(typedi_1.Container);
 class App {
