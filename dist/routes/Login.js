@@ -23,7 +23,6 @@ class LoginRouter {
             }
             let user = yield new UserRepository_1.UserRepository().findUserByUserName(userName)
                 .then(function (user) {
-                console.log('Got the final result: ' + user);
                 let encryptedTypedPassword = CryptoUtils_1.default.encrypt(password);
                 if (encryptedTypedPassword == user.passHash) {
                     let token = CryptoUtils_1.default.createTokenToUser(user);
